@@ -45,11 +45,6 @@ const mockExpeditions = {
   ],
 };
 
-const mockApi = {
-  getMyExpeditions: async () => mockExpeditions,
-  logout: async () => null,
-};
-
 export default {
   title: "Pages/DashboardPage",
   component: DashboardPage,
@@ -58,18 +53,34 @@ export default {
   },
   decorators: [
     (Story) => {
-      expeditionApi.getMyExpeditions = mockApi.getMyExpeditions;
-      authApi.logout = mockApi.logout;
-
-      const originalLocalStorage = global.localStorage;
+      expeditionApi.getMyExpeditions = () => Promise.resolve(mockExpeditions);
+      expeditionApi.getExpeditionParticipants = () => Promise.resolve([]);
+      expeditionApi.deleteExpedition = () => Promise.resolve();
+      expeditionApi.editExpedition = () => Promise.resolve();
+      expeditionApi.addParticipant = () => Promise.resolve();
+      expeditionApi.removeParticipant = () => Promise.resolve();
+      expeditionApi.leaveExpedition = () => Promise.resolve();
+      expeditionApi.createExpedition = () => Promise.resolve({ id: 999 });
+      
+      authApi.logout = () => Promise.resolve();
+      
+      userApi.searchByIndividualNumber = () => Promise.resolve({
+        firstName: "Иван",
+        lastName: "Петров",
+        email: "ivan@arctic.ru",
+        individualNumber: "ARCTIC-001",
+      });
 
       const mockStorage = {
-        ...originalLocalStorage,
         getItem: (key) => {
           if (key === "userEmail") return "ivan@arctic.ru";
           if (key === "individualNumber") return "ARCTIC-001";
-          return originalLocalStorage.getItem(key);
+          if (key === "userRoles") return JSON.stringify(["ROLE_ADMIN", "ROLE_LEADER"]);
+          if (key === "accessToken") return "mock-token-123456";
+          return null;
         },
+        setItem: () => {},
+        removeItem: () => {},
       };
 
       Object.defineProperty(global, "localStorage", {
@@ -78,19 +89,12 @@ export default {
         configurable: true,
       });
 
-      userApi.searchByIndividualNumber = async () => ({
-        firstName: "Иван",
-        lastName: "Петров",
-        email: "ivan@arctic.ru",
-        individualNumber: "ARCTIC-001",
-      });
-
       return (
         <MemoryRouter initialEntries={["/dashboard"]}>
           <Routes>
             <Route path="/dashboard" element={<Story />} />
-            <Route path="/login" element={<div />} />
-            <Route path="/admin" element={<div />} />
+            <Route path="/login" element={<div>Login Page</div>} />
+            <Route path="/admin" element={<div>Admin Page</div>} />
           </Routes>
         </MemoryRouter>
       );
@@ -98,23 +102,4 @@ export default {
   ],
 };
 
-export const Default = {
-  decorators: [
-    (Story) => (
-      <div
-        onClickCapture={(e) => {
-          if (
-            e.target.tagName === "BUTTON" ||
-            e.target.closest(".expedition-list__item")
-          ) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log("Навигация отключена в Storybook");
-          }
-        }}
-      >
-        <Story />
-      </div>
-    ),
-  ],
-};
+export const Default = {};

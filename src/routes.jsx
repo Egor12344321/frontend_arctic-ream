@@ -40,6 +40,10 @@ export const routesConfig = [
     element: <Navigate to="/login" />,
   },
   {
+    path: "/frontend_arctic-ream",
+    element: <Navigate to="/login" />,
+  },
+  {
     path: "/login",
     element: <LoginPage />,
   },

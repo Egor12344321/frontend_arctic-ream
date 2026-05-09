@@ -1,4 +1,4 @@
-import { BrowserRouter, useRoutes } from "react-router-dom";
+import { HashRouter, useRoutes } from "react-router-dom";
 import "./assets/animations.css";
 import "./assets/styles_new.css";
 import { routesConfig } from "./routes";
